@@ -1,8 +1,10 @@
 package com.nowcoder.community;
 
 import com.nowcoder.community.dao.DiscussPostMapper;
+import com.nowcoder.community.dao.LoginTicketMapper;
 import com.nowcoder.community.dao.UserMapper;
 import com.nowcoder.community.entity.DiscussPost;
+import com.nowcoder.community.entity.LoginTicket;
 import com.nowcoder.community.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +14,20 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.Date;
 import java.util.List;
 
+
+/**
+ * 在Mybatis中使用sql有两种方式：1.编写Mapper对应的xml文件。2.在Mapper中直接使用sql语句的注解。
+ * 但是由于sql语句是字符串的形式因此没有语法提示等容易出错，因此在写完Mapper后尽量在MapperTests中先测试一下是否有错误。
+ */
 @ContextConfiguration(classes = CommunityApplication.class)
 @SpringBootTest
-public class MapperTest {
+public class MapperTests {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
 
     @Test
     public void testSelectUser(){
@@ -66,5 +76,26 @@ public class MapperTest {
         }
         int i = discussPostMapper.selectDiscussPostRows(0);
         System.out.println(i);
+    }
+
+    @Test
+    public void testInsertLoginTicket(){
+
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(101);
+        loginTicket.setStatus(0);
+        loginTicket.setTicket("abc");
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + 1000 * 60 * 10));
+
+        int i = loginTicketMapper.insertLoginTicket(loginTicket);
+    }
+
+    @Test
+    public void testSelectLoginTicket(){
+        LoginTicket loginTicket = loginTicketMapper.selectByTicket("abc");
+        System.out.println(loginTicket);
+        loginTicketMapper.updateStatus("abc", 1);
+        loginTicket = loginTicketMapper.selectByTicket("abc");
+        System.out.println(loginTicket);
     }
 }
